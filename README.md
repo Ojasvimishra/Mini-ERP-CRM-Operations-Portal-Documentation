@@ -1,120 +1,213 @@
-# PROJECT HANDOVER & SUBMISSION DOSSIER
-## Mini ERP + CRM Operations Portal
+# 🌟 Mini ERP + CRM Operations Portal
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-React%20%7C%20Vite-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Badge" />
+  <img src="https://img.shields.io/badge/Backend-Node.js%20%7C%20Express-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node Badge" />
+  <img src="https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL Badge" />
+  <img src="https://img.shields.io/badge/ORM-Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma Badge" />
+</p>
+
+A premium, modern, and highly responsive **Mini ERP + CRM Operations Portal** built for wholesale and distribution enterprises. Featuring a gorgeous glassmorphic user interface, robust role-based access control (RBAC), and transactional inventory management.
 
 ---
 
-### 🌐 1. Live Deployment & Repository Links
+## 🚀 Live Deployments & Repository Links
 
-* **GitHub Repository URL**: [https://github.com/Ojasvimishra/Mini-ERP-CRM-Operations-Portal-Documentation](https://github.com/Ojasvimishra/Mini-ERP-CRM-Operations-Portal-Documentation)
-* **Live Frontend Dashboard (Vercel)**: [https://mini-erp-crm-operations-portal-docu.vercel.app/](https://mini-erp-crm-operations-portal-docu.vercel.app/)
-* **Live Backend API Gateway (Render)**: [https://crm-backend-api-u0ak.onrender.com](https://crm-backend-api-u0ak.onrender.com)
-* **Production Database Connection URL (Neon)**: 
+* **🖥️ Live Frontend Dashboard (Vercel)**: [https://mini-erp-crm-operations-portal-docu.vercel.app/](https://mini-erp-crm-operations-portal-docu.vercel.app/)
+* **⚙️ Live Backend API Gateway (Render)**: [https://crm-backend-api-u0ak.onrender.com](https://crm-backend-api-u0ak.onrender.com)
+* **🩺 Backend Health Endpoint**: [https://crm-backend-api-u0ak.onrender.com/health](https://crm-backend-api-u0ak.onrender.com/health)
+* **📦 GitHub Repository URL**: [https://github.com/Ojasvimishra/Mini-ERP-CRM-Operations-Portal-Documentation](https://github.com/Ojasvimishra/Mini-ERP-CRM-Operations-Portal-Documentation)
+* **🗄️ Neon Cloud Connection string**: 
   `postgresql://neondb_owner:npg_6xAYiSv7LpEd@ep-wandering-forest-azqhqsy4-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
 
 ---
 
-### 🔑 2. Test Login Credentials
-*(All roles share the default password: **`password123`**)*
+## 🔑 Role-Based Access & Test Credentials
 
-| Role | Email Credentials | Key Permissions |
+The application secures operations via signed **JWT tokens**. Log in to test user-specific dashboard permissions:
+
+> 🔐 **Default Password for All Accounts:** `password123`
+
+| User Role | Credentials / Email | Authorized Module Operations |
 | :--- | :--- | :--- |
-| **Admin** | `admin@example.com` | Unlimited access (Client CRM, Catalog, Stock corrections, & Sales Challans) |
-| **Sales** | `sales@example.com` | CRM (Add/Edit), Catalog views, Challan creation (Save/Confirm) |
-| **Warehouse** | `warehouse@example.com` | View live stock, manually adjust quantities, confirm pending challans |
-| **Accounts** | `accounts@example.com` | View customer portfolios and product catalog, cancel confirmed challans |
+| <span style="color:#e53e3e; font-weight:bold;">🔴 Admin</span> | `admin@example.com` | Full read/write access (Client CRM, Catalog editing, Manual stock corrections, and Challans). |
+| <span style="color:#d69e2e; font-weight:bold;">🟡 Sales</span> | `sales@example.com` | Create client files, edit CRM records, view inventory catalog, and create sales challans. |
+| <span style="color:#319795; font-weight:bold;">🟢 Warehouse</span>| `warehouse@example.com` | Monitor inventory thresholds, perform manual stock adjustments (IN/OUT), and confirm challans. |
+| <span style="color:#3182ce; font-weight:bold;">🔵 Accounts</span> | `accounts@example.com` | View customer portfolios, view product catalog, and cancel confirmed challans. |
 
 ---
 
-### 📐 3. System Architecture & Tech Stack
+## 📐 System Architecture
 
 ```mermaid
 graph TD
     subgraph Client ["Client Layer (Vercel)"]
-        React["React (Vite + TypeScript)"]
-        CSS["Glassmorphism UI System"]
+        React["React SPA (Vite + TS)"]
+        CSS["Glassmorphism Theme System"]
         PDF["jsPDF Exporter"]
     end
 
     subgraph Server ["Server Layer (Render)"]
-        Express["Express.js (TypeScript)"]
+        Express["Express.js API Router"]
         Prisma["Prisma ORM Client"]
     end
 
     subgraph Database ["Persistence Layer (Neon)"]
-        Postgres["PostgreSQL DB Cluster"]
+        Postgres["PostgreSQL Database Cluster"]
     end
 
-    React -->|HTTP Requests with JWT Bearer| Express
+    React -->|REST Calls / JWT Authorization| Express
     Express --> Prisma
     Prisma --> Postgres
 ```
 
-#### Key Architecture Principles
-* **Dynamic Role-Based Access Control (RBAC)**: The React client decodes the user's role payload from the signed JSON Web Token (JWT) at login to customize navigation views, tables, and button permissions.
-* **Transactional Safety (ACID)**: Grid actions like stock confirmations (deductions) and cancellations (restorations) run under Prisma database transactions to guarantee stock consistency.
-* **Historical Price Snapshots**: Challans capture the unit price and description of items at creation time, decoupling past invoice records from future catalog price edits.
+### 💎 Key Architectural Patterns
+* 🔒 **Transactional Integrity**: Creating, confirming, and canceling challans is performed inside database-level ACID transactions to ensure zero-sum stock movements.
+* 📸 **Historical Price Snapshots**: Challans capture the description and price of products at creation time to prevent modifications in the future from corrupting past accounting logs.
+* 🎨 **Glassmorphism Design**: Designed with high-end glassmorphism style featuring modern typography, harmonious colors, shadows, and clean visual indicators.
 
 ---
 
-### 📡 4. REST API Documentation
+## 📡 REST API Documentation
 
-#### 🔐 Auth Endpoint (`/api/auth`)
-* `POST /api/auth/login` - Validates credentials and returns JWT session token.
-* `GET /api/auth/me` - Decodes active token and returns the current user profile.
+<details>
+<summary>🔑 Click to view Authentication Endpoints (<code>/api/auth</code>)</summary>
 
-#### 👥 Customer CRM (`/api/customers`)
-* `GET /api/customers` - Returns client index list.
-* `GET /api/customers/:id` - Returns single customer folder including follow-up history.
-* `POST /api/customers` - Add a new customer record.
-* `PUT /api/customers/:id` - Edit customer information.
-* `POST /api/customers/:id/notes` - Append follow-up communication log.
+* `POST /api/auth/login` - Authenticate account and receive JWT token.
+* `GET /api/auth/me` - Fetch profile details of the active JWT token owner.
+</details>
 
-#### 📦 Inventory (`/api/products`)
-* `GET /api/products` - Returns catalog items, storage locations, and quantities.
-* `GET /api/products/:id` - Fetch item details.
-* `POST /api/products` - Create new product (Admin & Warehouse only).
-* `PUT /api/products/:id` - Update catalog specifications (Admin & Warehouse only).
-* `POST /api/products/:id/stock` - Post manual stock adjustments (IN/OUT) with change logs.
+<details>
+<summary>👥 Click to view Customer CRM Endpoints (<code>/api/customers</code>)</summary>
 
-#### 🧾 Sales Challans (`/api/challans`)
-* `GET /api/challans` - List all challans.
-* `GET /api/challans/:id` - Fetch detailed challan including product snapshots.
-* `POST /api/challans` - Save a draft challan.
-* `POST /api/challans/:id/confirm` - Confirm challan (locks price and deducts stock under ACID transaction).
-* `POST /api/challans/:id/cancel` - Cancel confirmed challan (restores stock).
+* `GET /api/customers` - Fetch complete client list.
+* `GET /api/customers/:id` - Fetch single customer with follow-up communication histories.
+* `POST /api/customers` - Create new customer record (Admin & Sales).
+* `PUT /api/customers/:id` - Edit customer information (Admin & Sales).
+* `POST /api/customers/:id/notes` - Add follow-up logs/conversation logs (Admin & Sales).
+</details>
 
----
+<details>
+<summary>📦 Click to view Inventory Catalog Endpoints (<code>/api/products</code>)</summary>
 
-### 🛠️ 5. Setup & Deployment Instructions
+* `GET /api/products` - List all products, warehouse locations, and stock levels.
+* `GET /api/products/:id` - Retrieve product details.
+* `POST /api/products` - Register new product in catalog (Admin & Warehouse).
+* `PUT /api/products/:id` - Update product details (Admin & Warehouse).
+* `POST /api/products/:id/stock` - Post manual stock adjustments (IN/OUT) with audited logging.
+</details>
 
-#### Local Setup
-1. **Clone & Configure Backend**:
-   * Navigate to `backend/` directory, create a `.env` file:
-     ```env
-     PORT=5000
-     DATABASE_URL="postgresql://neondb_owner:npg_6xAYiSv7LpEd@ep-wandering-forest-azqhqsy4-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-     JWT_SECRET="super-secret-key-change-in-production"
-     ```
-   * Install dependencies and run schema sync:
-     ```bash
-     npm install
-     npx prisma db push
-     npm run prisma:seed
-     npm run dev
-     ```
-2. **Configure Frontend**:
-   * Navigate to `frontend/` directory, install packages, and boot client:
-     ```bash
-     npm install
-     npm run dev
-     ```
+<details>
+<summary>🧾 Click to view Sales Challan Endpoints (<code>/api/challans</code>)</summary>
 
-#### Cloud Deployment
-* **Backend (Render Web Service)**: Set root directory to `backend`. Set build command to `npm install && npm run build && npx prisma generate` and start command to `npx prisma db push && npm run prisma:seed && npm start`. Add env variables: `PORT=10000`, `DATABASE_URL` (Neon Connection), and `JWT_SECRET`. Set Health Check path to `/health`.
-* **Frontend (Vercel Project)**: Connect GitHub, select root directory `frontend` and framework preset `Vite`. Set environment variable `VITE_API_URL` to `https://crm-backend-api-u0ak.onrender.com/api`.
+* `GET /api/challans` - List all order challans.
+* `GET /api/challans/:id` - Fetch specific challan including historical price snapshots.
+* `POST /api/challans` - Save a new draft sales challan (Admin & Sales).
+* `POST /api/challans/:id/confirm` - Confirm challan status and deduct stock (Admin, Sales & Warehouse).
+* `POST /api/challans/:id/cancel` - Cancel challan and restore stock (Admin, Sales & Accounts).
+</details>
 
 ---
 
-### ⚠️ 6. Known Limitations
-1. **User Management Screen**: The system lacks a frontend form to create user logins. New accounts must be created using Prisma Studio, SQL commands, or seed scripts.
-2. **Render Cold Starts**: Because the backend is deployed on Render's free tier, the container spins down after 15 minutes of inactivity. The initial application load may take ~40 seconds while the web service wakes up.
+## 🛠️ Step-by-Step Installation & Local Setup
+
+### 🗄️ Database Setup
+Ensure that a **PostgreSQL** instance is running locally on port **`5432`** using the credentials:
+* **Host / Port**: `localhost:5432`
+* **Username**: `postgres`
+* **Password**: `Ojasvi@123`
+* **Database Name**: `crm_db`
+
+---
+
+### ⚙️ Step 1: Configure & Start API Server
+1. Navigate into the backend workspace folder:
+   ```bash
+   cd backend
+   ```
+2. Install the necessary project dependencies:
+   ```bash
+   npm install
+   ```
+3. Sync and push the Prisma database schema:
+   ```bash
+   npx prisma db push
+   ```
+4. Load initial database seeds (accounts, products, and clients):
+   ```bash
+   npm run prisma:seed
+   ```
+5. Spin up the backend server in development mode:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+### 💻 Step 2: Configure & Start Frontend
+1. Open a new terminal command prompt and navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install client dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the Vite React development server:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## ☁️ Production Cloud Deployment Guide
+
+This section explains how to deploy the entire stack to the cloud using free-tier services.
+
+### 1. Database Deployment (Neon)
+1. Go to [https://neon.tech/](https://neon.tech/) and create a new project.
+2. Select PostgreSQL version 15 or 16 and your preferred hosting region.
+3. Once the database is initialized, copy the connection string. It will look like this:
+   ```env
+   postgresql://alex:password@ep-cool-butterfly-123456.us-east-2.aws.neon.tech/neondb?sslmode=require
+   ```
+   *This is your production `DATABASE_URL`.*
+
+### 2. Backend API Deployment (Render)
+1. Sign up/Log in to [Render](https://render.com/).
+2. Create a new **Web Service** and connect your GitHub repository.
+3. Configure the service settings:
+   * **Root Directory**: `backend`
+   * **Environment**: `Node`
+   * **Build Command**: `npm install && npm run build && npx prisma generate`
+   * **Start Command**: `npx prisma db push && npm run prisma:seed && npm start`
+4. Expand the **Environment Variables** section and configure:
+   * `PORT`: `10000`
+   * `DATABASE_URL`: *[Paste your Neon database connection URL]*
+   * `JWT_SECRET`: *[Generate a random secure string]*
+5. Click **Create Web Service**. Wait for it to build and log `Server is running on port 10000`. Copy the live API URL (e.g., `https://crm-backend.onrender.com`).
+
+### 3. Frontend Deployment (Vercel)
+1. Sign up/Log in to [Vercel](https://vercel.com/).
+2. Create a new project and import your GitHub repository.
+3. Configure the build parameters:
+   * **Root Directory**: `frontend`
+   * **Framework Preset**: `Vite`
+   * **Build Command**: `npm run build`
+   * **Output Directory**: `dist`
+4. Under **Environment Variables**, add:
+   * **Key**: `VITE_API_URL`
+   * **Value**: `https://crm-backend.onrender.com/api` *(Paste your Render backend API URL and append `/api`)*
+5. Click **Deploy**. Vercel will host your compiled static dashboard.
+
+---
+
+## 📋 Environment Variable Management
+* **Local Development**: Variables are loaded from `.env` files in `backend/` and `frontend/` directories (gitignored).
+* **Production Deployment**: Database secrets and API connection targets are managed securely through Vercel and Render dashboards, preventing credentials leakage.
+
+---
+
+## ⚠️ Known Limitations & Incomplete Elements
+1. **User Administration Screens**: Adding new backend operators or editing accounts requires direct database insertions or executing custom scripts (no frontend user creation form is available).
+2. **Cold Starts**: Render's free tier automatically suspends backend containers after 15 minutes of inactivity. When visiting the portal for the first time in a session, allow ~40 seconds for the backend/database to wake up.
