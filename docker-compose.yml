@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: crm_postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: crm_secure_password
+      POSTGRES_DB: crm_db
+    ports:
+      - "5435:5432" # expose on 5435 to avoid conflicts with local Postgres on 5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: crm_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      DATABASE_URL: "postgresql://postgres:crm_secure_password@db:5432/crm_db?schema=public"
+      JWT_SECRET: "super-secret-key-change-in-production"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: crm_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
