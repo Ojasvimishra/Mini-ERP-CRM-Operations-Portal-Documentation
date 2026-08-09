@@ -146,7 +146,54 @@ Ensure that a **PostgreSQL** instance is running locally on port **`5432`** usin
 
 ---
 
-## ⚠️ Known Limitations & Incomplete Elements
+## ☁️ Production Cloud Deployment Guide
 
-1. **User Sign-up Panel**: User account registration has no front-end user interface. New accounts must be created using SQL scripts, Prisma Studio, or seed scripts.
-2. **Local Scope Presets**: Port mappings, database access configurations, and API URLs are configured for local environment testing. Deployment to external cloud providers (e.g. Render, Vercel) requires updating production connection strings and environment keys.
+This section explains how to deploy the entire stack to the cloud using free-tier services.
+
+### 1. Database Deployment (Neon)
+1. Go to [https://neon.tech/](https://neon.tech/) and create a new project.
+2. Select PostgreSQL version 15 or 16 and your preferred hosting region.
+3. Once the database is initialized, copy the connection string. It will look like this:
+   ```env
+   postgresql://alex:password@ep-cool-butterfly-123456.us-east-2.aws.neon.tech/neondb?sslmode=require
+   ```
+   *This is your production `DATABASE_URL`.*
+
+### 2. Backend API Deployment (Render)
+1. Sign up/Log in to [Render](https://render.com/).
+2. Create a new **Web Service** and connect your GitHub repository.
+3. Configure the service settings:
+   * **Root Directory**: `backend`
+   * **Environment**: `Node`
+   * **Build Command**: `npm install && npm run build && npx prisma generate`
+   * **Start Command**: `npx prisma db push && npm run prisma:seed && npm start`
+4. Expand the **Environment Variables** section and configure:
+   * `PORT`: `10000`
+   * `DATABASE_URL`: *[Paste your Neon database connection URL]*
+   * `JWT_SECRET`: *[Generate a random secure string]*
+5. Click **Create Web Service**. Wait for it to build and log `Server is running on port 10000`. Copy the live API URL (e.g., `https://crm-backend.onrender.com`).
+
+### 3. Frontend Deployment (Vercel)
+1. Sign up/Log in to [Vercel](https://vercel.com/).
+2. Create a new project and import your GitHub repository.
+3. Configure the build parameters:
+   * **Root Directory**: `frontend`
+   * **Framework Preset**: `Vite`
+   * **Build Command**: `npm run build`
+   * **Output Directory**: `dist`
+4. Under **Environment Variables**, add:
+   * **Key**: `VITE_API_URL`
+   * **Value**: `https://crm-backend.onrender.com/api` *(Paste your Render backend API URL and append `/api`)*
+5. Click **Deploy**. Vercel will host your compiled static dashboard.
+
+---
+
+## 📋 Environment Variable Management
+* **Local Development**: Variables are loaded from `.env` files in `backend/` and `frontend/` directories (gitignored).
+* **Production Deployment**: Database secrets and API connection targets are managed securely through Vercel and Render dashboards, preventing credentials leakage.
+
+---
+
+## ⚠️ Known Limitations & Incomplete Elements
+1. **User Administration Screens**: Adding new backend operators or editing accounts requires direct database insertions or executing custom scripts (no frontend user creation form is available).
+2. **Cold Starts**: Render's free tier automatically suspends backend containers after 15 minutes of inactivity. When visiting the portal for the first time in a session, allow ~40 seconds for the backend/database to wake up.
